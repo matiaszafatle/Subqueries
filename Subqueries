@@ -1,0 +1,47 @@
+- Subqueries
+
+SELECT *
+FROM bakery.customers
+WHERE customer_id IN(
+SELECT customer_id
+FROM bakery.customer_orders)
+;
+
+SELECT *
+FROM bakery.customers
+WHERE customer_id IN (
+SELECT customer_id
+FROM bakery.customer_orders
+WHERE tip > 1)
+;
+
+SELECT *
+FROM bakery.customers
+WHERE total_money_spent > (SELECT AVG(total_money_spent)
+							FROM bakery.customers);
+
+- MAX vs. ALL
+
+SELECT 
+	shipper_id, order_id, quantity, unit_price, (quantity * unit_price) AS total_order_price
+FROM bakery. ordered_items
+WHERE (quantity * unit_price) >  (SELECT MAX(quantity * unit_price) AS total_order_price
+									FROM bakery.ordered_items
+                                    WHERE shipper_id = 1 )
+;
+
+SELECT 
+	shipper_id, order_id, quantity, unit_price, (quantity * unit_price) AS total_order_price
+FROM bakery. ordered_items
+WHERE (quantity * unit_price) > ALL (SELECT (quantity * unit_price) AS total_order_price
+									FROM bakery.ordered_items
+                                    WHERE shipper_id = 1 )
+;
+
+- ANY
+SELECT 
+	shipper_id, order_id, quantity, unit_price, (quantity * unit_price) AS total_order_price
+FROM bakery. ordered_items
+WHERE (quantity * unit_price) > ANY (SELECT (quantity * unit_price) AS total_order_price
+									FROM bakery.ordered_items
+                                    WHERE shipper_id = 1 )
